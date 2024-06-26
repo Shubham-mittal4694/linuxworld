@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blur Image</title>
+    <link rel="icon" href="data:,">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        nav {
+            width: 100%;
+            background-color: #4285f4;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #ccc;
+        }
+        h1 {
+            color: #333;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        input[type="file"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            width: 100%;
+        }
+        .image-container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Blur Image</a></li>
+        </ul>
+    </nav>
+    <h1>Blur Image</h1>
+    <form id="imageForm" enctype="multipart/form-data">
+        <label for="uploadImage">Upload Image:</label>
+        <input type="file" id="uploadImage" name="image" accept="image/*" required>
+
+        <input type="submit" value="Blur Image">
+    </form>
+
+    <div class="image-container" id="imageContainer" style="display: none;">
+        <h2>Blurred Image</h2>
+        <img id="blurredImage" src="" alt="Blurred Image">
+    </div>
+
+    <script>
+        document.getElementById('imageForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting the traditional way
+
+            const formData = new FormData(this);
+
+            fetch('http://localhost:8000/cgi-bin/blur_image.py', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const blurredImagePath = data.blurred_image_path;
+                    const blurredImageElement = document.getElementById('blurredImage');
+                    blurredImageElement.src = blurredImagePath;
+                    document.getElementById('imageContainer').style.display = 'block';
+                } else {
+                    alert('Failed to blur image. Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while blurring image.');
+            });
+        });
+    </script>
+</body>
+</html>

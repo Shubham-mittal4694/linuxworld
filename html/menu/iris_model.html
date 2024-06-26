@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iris Species Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #333;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav {
+            width: 100%;
+            background-color: #4285f4;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #ccc;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        input[type="number"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #357ae8;
+        }
+        .prediction {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+    <h1>Iris Species Prediction</h1>
+    <form action="http://localhost:8000/cgi-bin/iris_model.py" method="post">
+        <label for="sepal_length">Sepal Length (cm):</label><br>
+        <input type="number" id="sepal_length" name="sepal_length" step="any" min="0" required><br>
+        <label for="sepal_width">Sepal Width (cm):</label><br>
+        <input type="number" id="sepal_width" name="sepal_width" step="any" min="0" required><br>
+        <label for="petal_length">Petal Length (cm):</label><br>
+        <input type="number" id="petal_length" name="petal_length" step="any" min="0" required><br>
+        <label for="petal_width">Petal Width (cm):</label><br>
+        <input type="number" id="petal_width" name="petal_width" step="any" min="0" required><br>
+        <input type="submit" value="Predict Species">
+    </form>
+    <div class="prediction">
+        <!-- <h2>Predicted Species:</h2> -->
+        <h2 id="predicted_species"></h2>
+    </div>
+
+    <script>
+        // Submit form via AJAX
+        document.querySelector("form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var form = this;
+            var formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("predicted_species").textContent = data.trim();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #draggable {
+            width: 100px;
+            height: 100px;
+            background-color: lightblue;
+            position: absolute;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="draggable">Drag me!</div>
+
+<script>
+    // Get the draggable element
+    var draggable = document.getElementById("draggable");
+
+    // Initialize variables to store the initial mouse and element positions
+    var offsetX = 0, offsetY = 0, initialMouseX = 0, initialMouseY = 0;
+
+    draggable.addEventListener('mousedown', onMouseDown);
+
+    function onMouseDown(e) {
+        // Prevent default behavior
+        e.preventDefault();
+
+        // Get the initial mouse positions
+        initialMouseX = e.clientX;
+        initialMouseY = e.clientY;
+
+        // Add event listeners for mousemove and mouseup
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(e) {
+        // Calculate the new cursor position
+        var deltaX = e.clientX - initialMouseX;
+        var deltaY = e.clientY - initialMouseY;
+
+        // Set the new position of the element
+        draggable.style.left = (draggable.offsetLeft + deltaX) + 'px';
+        draggable.style.top = (draggable.offsetTop + deltaY) + 'px';
+
+        // Update the initial mouse positions for the next movement
+        initialMouseX = e.clientX;
+        initialMouseY = e.clientY;
+    }
+
+    function onMouseUp() {
+        // Remove the event listeners
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+</script>
+
+</body>
+</html>

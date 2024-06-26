@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #chatbox {
+            width: 300px;
+            height: 400px;
+            border: 1px solid black;
+            padding: 10px;
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+        #input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chatbox">
+    <div id="messages"></div>
+    <input type="text" id="input" placeholder="Type your message here">
+    <button id="send">Send</button>
+</div>
+
+<script>
+    document.getElementById("send").addEventListener("click", sendMessage);
+
+    async function sendMessage() {
+        var input = document.getElementById("input").value;
+        if (!input) return;
+        
+        var messagesDiv = document.getElementById("messages");
+        messagesDiv.innerHTML += `<div><b>You:</b> ${input}</div>`;
+        
+        var response = await getChatGPTResponse(input);
+        messagesDiv.innerHTML += `<div><b>ChatGPT:</b> ${response}</div>`;
+        
+        document.getElementById("input").value = "";
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    async function getChatGPTResponse(prompt) {
+        const apiKey = '';
+        const url = 'https://api.openai.com/v1/engines/babbage-002/completions';
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                max_tokens: 150
+            })
+        });
+        
+        const data = await response.json();
+        return data.choices[0].text.trim();
+    }
+</script>
+
+</body>
+</html>

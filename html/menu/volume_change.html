@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Microphone Volume</title>
+    <link rel="icon" href="data:,">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        nav {
+            width: 100%;
+            background-color: #4285f4;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #ccc;
+        }
+        h1 {
+            color: #333;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        input[type="number"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #357ae8;
+        }
+        .current-volume {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Control Microphone Volume</a></li>
+        </ul>
+    </nav>
+    <h1>Control Microphone Volume</h1>
+    <form id="volumeForm">
+        <label for="volume">Enter Volume Level (0-100):</label>
+        <input type="number" id="volume" name="volume" min="0" max="100" required>
+        <input type="submit" value="Set Volume">
+    </form>
+
+    <div class="current-volume" id="currentVolumeContainer">
+        <h2>Current Microphone Volume:</h2>
+        <p id="currentVolume">Loading...</p>
+    </div>
+
+    <script>
+        // Function to update the current volume display
+        function updateCurrentVolume() {
+            fetch('http://localhost:8000/cgi-bin/volume_change.py')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('currentVolume').textContent = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('currentVolume').textContent = 'Failed to retrieve volume.';
+            });
+        }
+
+        // Update current volume initially and then every 5 seconds
+        updateCurrentVolume();
+        setInterval(updateCurrentVolume, 5000);
+
+        // Form submission handler
+        document.getElementById('volumeForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting the traditional way
+
+            const formData = new FormData(this);
+
+            fetch('http://localhost:8000/cgi-bin/volume_change.py', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('currentVolume').textContent = data;
+                document.getElementById('volume').value = ''; // Clear input field after submission
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('currentVolume').textContent = 'Failed to set volume.';
+            });
+        });
+    </script>
+</body>
+</html>

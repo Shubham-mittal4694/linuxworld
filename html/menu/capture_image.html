@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Image Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* min-height: 100vh; */
+            margin: 0;
+            padding: 0;
+        }
+        #videoContainer {
+            margin-bottom: 20px;
+        }
+        nav {
+            width: 100%;
+            background-color: #4285f4;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+    <h2>Webcam Image Capture</h2>
+    <div id="videoContainer">
+        <video id="video" width="640" height="480" autoplay></video>
+    </div>
+    <button id="captureButton">Capture Image</button>
+    
+    <script>
+        // Get access to the webcam stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                // Assign the webcam stream to the <video> element
+                var videoElement = document.getElementById('video');
+                videoElement.srcObject = stream;
+            })
+            .catch(function(error) {
+                console.error('Error accessing webcam:', error);
+            });
+
+        // Handle button click to capture image
+        document.getElementById('captureButton').addEventListener('click', function() {
+            var videoElement = document.getElementById('video');
+            var canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            // Convert captured image to data URL
+            var imageDataURL = canvas.toDataURL('image/jpeg');
+
+            // Create a form to submit image data to the server
+            var form = new FormData();
+            form.append('imageData', imageDataURL);
+
+            // Submit the form to the CGI script for processing
+            fetch('http://localhost:8000/cgi-bin/capture_image.py', {
+                method: 'POST',
+                body: form
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Failed to capture image.');
+                }
+            })
+            .then(data => {
+                // Display the captured image URL or handle response as needed
+                console.log('Captured image URL:', data);
+                alert('Image captured successfully!');
+            })
+            .catch(error => {
+                console.error('Error capturing image:', error);
+                alert('Failed to capture image.');
+            });
+        });
+    </script>
+</body>
+</html>

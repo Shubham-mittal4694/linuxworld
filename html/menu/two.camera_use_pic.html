@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Combined Camera Feed</title>
+</head>
+<body>
+    <h1>Start Combined Camera Feed</h1>
+    <form action="/cgi-bin/two.camera_use_pic.py" method="get">
+        <label for="camera1_index">Camera 1 Index:</label>
+        <input type="number" id="camera1_index" name="camera1_index" value="0" required><br><br>
+        
+        <label for="camera2_index">Camera 2 Index:</label>
+        <input type="number" id="camera2_index" name="camera2_index" value="1" required><br><br>
+        
+        <input type="submit" value="Start">
+    </form>
+</body>
+</html>
